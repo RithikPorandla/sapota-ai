@@ -10,7 +10,7 @@ Massachusetts inventoried 9,543 coastal protection structures between 2006 and 2
 
 We turn that latent feed into a living, ranked repair queue with dollar value at risk, repair cost estimate, and FEMA/storm exposure for every structure.
 
-**First customer:** Scituate, MA. **Next eight:** Hull, Hingham, Marshfield, Cohasset, Duxbury, Weymouth, Boston, Quincy (already ranked in pipeline). **Then horizontal:** NJ, NC, FL, CA — same playbook, different state inventory.
+**First customer:** Scituate, MA. **Next eight:** Hull, Hingham, Marshfield, Cohasset, Duxbury, Weymouth, Boston, Quincy (already ranked in pipeline). **Massachusetts-first through 2026**, then adjacent NE states, then insurance/reinsurance data licensing, then federal. See `PLATFORM.md`.
 
 ---
 
@@ -45,9 +45,11 @@ Not any single component. The combination:
 
 ## Repo map
 
-- `GTM.md` — who, how, for how much
+- `GTM.md` — who, how, for how much (Massachusetts-first)
 - `90-day-plan.md` — weekly operating plan
+- `PLATFORM.md` — wedge → rings → 5-year platform vision
+- `AUTOMATION.md` — the stack and agents that let one person run this
 - `site/index.html` — sapota.ai landing page
 - `sales/one-pager.html` — leave-behind for municipal meetings
 - `sales/roi-calculator.html` — interactive pilot-value tool
-- `research/` — customer interview notes, funding paths, competitive scan (populate as you go)
+- `research/` — customer interview notes, funding paths, competitive scan, contracts, grant templates (populate as you go)
