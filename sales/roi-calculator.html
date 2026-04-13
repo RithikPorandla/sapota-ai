@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sapota — ROI calculator for MA coastal towns</title>
+<style>
+  :root{--ink:#0b1419;--sea:#1b4f58;--sand:#f4efe6;--wash:#eadfc8;--rust:#b8532b;--line:#d9cfba;--good:#1a8c6a}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--sand);color:var(--ink);font-family:-apple-system,"Segoe UI",Inter,sans-serif;font-size:16px;line-height:1.5}
+  .wrap{max-width:900px;margin:0 auto;padding:32px 24px 80px}
+  h1{font-size:32px;margin:0 0 8px;letter-spacing:-.01em}
+  h1 em{font-style:normal;color:var(--rust)}
+  .lede{color:#41525a;max-width:620px;margin:0 0 28px}
+  .brand{font-weight:700;letter-spacing:.02em;font-size:18px;margin-bottom:20px}
+  .brand span{color:var(--rust)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:20px 22px;margin-bottom:18px}
+  h2{font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--sea);margin:0 0 14px}
+  .field{display:grid;grid-template-columns:1fr 180px 80px;gap:12px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .field:last-child{border-bottom:none}
+  .field label{font-size:14px}
+  .field label small{display:block;color:#6a7a80;font-size:12px;margin-top:2px}
+  .field input[type=range]{width:100%}
+  .field .val{font-family:"Fira Mono",Menlo,monospace;text-align:right;color:var(--sea);font-weight:600}
+  .output{background:var(--wash);border:1px solid var(--line);border-radius:6px;padding:22px 24px;margin-top:8px}
+  .out-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(27,79,88,.18);font-size:15px}
+  .out-row:last-child{border-bottom:none;padding-top:16px;margin-top:6px;border-top:2px solid var(--sea);font-size:20px;font-weight:700}
+  .out-row .n{font-family:"Fira Mono",Menlo,monospace;color:var(--ink)}
+  .big{font-size:42px;font-weight:700;color:var(--good);line-height:1;margin:12px 0 4px;font-family:"Fira Mono",Menlo,monospace}
+  .note{font-size:13px;color:#4a5a60;margin-top:18px}
+  .assumption{font-size:12px;color:#6a7a80;line-height:1.55;margin-top:8px}
+  .cta{display:inline-block;margin-top:22px;background:var(--ink);color:var(--sand);padding:12px 22px;border-radius:4px;text-decoration:none;font-weight:600}
+  .cta:hover{background:var(--rust)}
+  @media(max-width:640px){.field{grid-template-columns:1fr}.field .val{text-align:left}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Sapota<span>.</span></div>
+  <h1>What does Sapota <em>save your town?</em></h1>
+  <p class="lede">Quick estimate for any MA coastal municipality. Adjust the sliders to your town. The math is transparent — see assumptions at the bottom.</p>
+
+  <div class="card">
+    <h2>Your town</h2>
+    <div class="field">
+      <label>Coastal structures in town<small>Seawalls, revetments, jetties, groins, breakwaters, bulkheads</small></label>
+      <input id="structs" type="range" min="10" max="500" value="150" step="10">
+      <div class="val"><span id="structsV">150</span></div>
+    </div>
+    <div class="field">
+      <label>Average annual coastal capital spend<small>DPW &amp; infrastructure combined</small></label>
+      <input id="budget" type="range" min="100000" max="5000000" value="800000" step="50000">
+      <div class="val">$<span id="budgetV">800,000</span></div>
+    </div>
+    <div class="field">
+      <label>Estimated property value protected<small>Assessor data behind coastal structures</small></label>
+      <input id="val" type="range" min="10" max="3000" value="400" step="10">
+      <div class="val">$<span id="valV">400</span>M</div>
+    </div>
+    <div class="field">
+      <label>Years since last structure condition inventory<small>Massachusetts average: ~10 years</small></label>
+      <input id="years" type="range" min="0" max="25" value="10" step="1">
+      <div class="val"><span id="yearsV">10</span> yrs</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Traditional alternative — consultant field inventory</h2>
+    <div class="field">
+      <label>Consultant field-inventory cost per structure<small>Typical MA range: $300–$1,200/structure</small></label>
+      <input id="consCost" type="range" min="200" max="1500" value="650" step="50">
+      <div class="val">$<span id="consCostV">650</span></div>
+    </div>
+  </div>
+
+  <div class="output">
+    <h2 style="margin-top:0">Result</h2>
+
+    <div class="out-row"><div>Consultant inventory — one-time cost</div><div class="n">$<span id="oConsultant">-</span></div></div>
+    <div class="out-row"><div>Consultant timeline</div><div class="n"><span id="oTimeline">-</span> months</div></div>
+    <div class="out-row"><div>Sapota pilot — one-time</div><div class="n">$7,500</div></div>
+    <div class="out-row"><div>Sapota annual subscription (quarterly re-scoring)</div><div class="n">$18,000 / yr</div></div>
+    <div class="out-row"><div>Year-1 Sapota total</div><div class="n">$<span id="oSapY1">-</span></div></div>
+    <div class="out-row"><div>Year-1 direct savings vs consultant</div><div class="n" id="oSavings">-</div></div>
+
+    <div style="margin-top:20px">
+      <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#4a5a60">Indirect value (prioritization lift)</div>
+      <div class="big">$<span id="oLift">-</span></div>
+      <div style="font-size:14px;color:#3a4a51">estimated capital efficiency gain in year one</div>
+    </div>
+
+    <p class="note"><b>What drives the lift.</b> Towns that rebuild from a ranked priority list typically capture 10–25% more protective value per capital dollar than first-come / squeakiest-wheel prioritization. We use a conservative 15% uplift on your stated annual coastal capital spend.</p>
+  </div>
+
+  <div class="card">
+    <h2>Funding paths (if budget is the blocker)</h2>
+    <p style="margin-top:0">Your Sapota pilot is typically fundable under:</p>
+    <ul>
+      <li><b>MVP Action Grant</b> — MA EEA; $50k–$2M per town; assessment portion covers Sapota directly</li>
+      <li><b>Dam &amp; Seawall Repair or Removal Program</b> — MA DER; priority-list input is a scored grant component</li>
+      <li><b>Coastal Resilience Grant</b> — MA CZM; $25k–$500k</li>
+      <li><b>FEMA BRIC</b> — federal; multi-year</li>
+    </ul>
+    <p>We draft the grant narrative with you at no extra cost.</p>
+    <a class="cta" href="mailto:pilot@sapota.ai?subject=Sapota%20pilot%20for%20[town%20name]">Email pilot@sapota.ai</a>
+  </div>
+
+  <div class="assumption">
+    <b>Assumptions.</b> Consultant pilot costs reflect typical MA municipal coastal assessment ranges. Consultant timeline uses 0.05 months per structure (rough industry rule). Capital efficiency lift (15%) is based on published prioritization literature for infrastructure asset management; actual lift varies by town. Sapota subscription includes quarterly re-scoring and storm-triggered reassessment. Adjust sliders to your town's specifics. This is an estimator, not a guarantee.
+  </div>
+</div>
+
+<script>
+(function(){
+  const fmt = n => n.toLocaleString('en-US', {maximumFractionDigits:0});
+  const fmtMoney = n => '$' + fmt(Math.round(n));
+
+  const bind = (id, vid, transform) => {
+    const el = document.getElementById(id);
+    const v  = document.getElementById(vid);
+    const upd = () => { v.textContent = transform ? transform(+el.value) : fmt(+el.value); recompute(); };
+    el.addEventListener('input', upd); upd();
+  };
+
+  function recompute(){
+    const structs   = +document.getElementById('structs').value;
+    const budget    = +document.getElementById('budget').value;
+    const consCost  = +document.getElementById('consCost').value;
+
+    const consultantTotal  = structs * consCost;
+    const consultantMonths = Math.max(2, Math.round(structs * 0.05));
+    const sapY1            = 7500 + 18000;
+    const savings          = consultantTotal - sapY1;
+    const lift             = budget * 0.15;
+
+    document.getElementById('oConsultant').textContent = fmt(consultantTotal);
+    document.getElementById('oTimeline').textContent   = consultantMonths;
+    document.getElementById('oSapY1').textContent      = fmt(sapY1);
+    const sEl = document.getElementById('oSavings');
+    sEl.textContent = (savings >= 0 ? '+' : '') + fmtMoney(savings);
+    sEl.style.color = savings >= 0 ? 'var(--good)' : 'var(--rust)';
+    document.getElementById('oLift').textContent = fmt(lift);
+  }
+
+  bind('structs',  'structsV');
+  bind('budget',   'budgetV',   v => fmt(v));
+  bind('val',      'valV');
+  bind('years',    'yearsV');
+  bind('consCost', 'consCostV');
+})();
+</script>
+</body>
+</html>
